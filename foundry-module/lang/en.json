@@ -5,14 +5,20 @@
         "Name": "Connect to Stream Deck",
         "Hint": "Connect this browser to the Foundry Deck Stream Deck plugin. Only GM clients connect."
       },
-      "Url": {
-        "Name": "Stream Deck URL",
-        "Hint": "WebSocket address of the Foundry Deck Stream Deck plugin on this computer."
+      "Port": {
+        "Name": "Stream Deck port",
+        "Hint": "Must match the Port in the Connection section of any Foundry Deck key's settings in the Stream Deck app. Default: 17380."
+      },
+      "Token": {
+        "Name": "Stream Deck token",
+        "Hint": "Copy the Token from the Connection section of any Foundry Deck key's settings in the Stream Deck app."
       }
     },
     "Notifications": {
       "Connected": "Foundry Deck: connected to Stream Deck.",
-      "Replaced": "Foundry Deck: another Foundry tab took over the Stream Deck connection."
+      "Replaced": "Foundry Deck: another Foundry tab took over the Stream Deck connection.",
+      "MissingToken": "Foundry Deck: paste the token from the Stream Deck app into the module settings to connect.",
+      "Unauthorized": "Foundry Deck: the Stream Deck rejected the token. Copy the token from the Stream Deck app into the module settings again."
     }
   }
 }

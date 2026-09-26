@@ -3,7 +3,7 @@ import { createCommands } from "./commands.js";
 import { collectState } from "./state.js";
 
 const MODULE_ID = "foundry-deck";
-const DEFAULT_URL = "ws://127.0.0.1:17380";
+const DEFAULT_PORT = 17380;
 
 /** Hooks that can change anything in the state snapshot. */
 const STATE_HOOKS = [
@@ -27,14 +27,29 @@ const STATE_HOOKS = [
 /** @type {DeckBridge | null} */
 let bridge = null;
 
+const localize = (key) => game.i18n.localize(`FOUNDRY_DECK.${key}`);
+
+/** Same rules as the plugin: whole numbers from 1024 to 65535. */
+function validPort(value) {
+  const port = Number(value);
+  return Number.isInteger(port) && port >= 1024 && port <= 65535 ? port : DEFAULT_PORT;
+}
+
 function startBridge() {
   bridge?.disconnect();
   bridge = null;
 
   if (!game.user.isGM || !game.settings.get(MODULE_ID, "enabled")) return;
 
+  const token = game.settings.get(MODULE_ID, "token").trim();
+  if (!token) {
+    ui.notifications.warn(localize("Notifications.MissingToken"));
+    return;
+  }
+
   bridge = new DeckBridge({
-    url: game.settings.get(MODULE_ID, "url"),
+    url: `ws://127.0.0.1:${validPort(game.settings.get(MODULE_ID, "port"))}`,
+    token,
     commands: createCommands(game),
     getState: () => collectState(game),
     hello: () => ({
@@ -44,8 +59,9 @@ function startBridge() {
       user: game.user.name,
     }),
     onStatus: (status) => {
-      if (status === "connected") ui.notifications.info(game.i18n.localize("FOUNDRY_DECK.Notifications.Connected"));
-      if (status === "replaced") ui.notifications.warn(game.i18n.localize("FOUNDRY_DECK.Notifications.Replaced"));
+      if (status === "connected") ui.notifications.info(localize("Notifications.Connected"));
+      if (status === "replaced") ui.notifications.warn(localize("Notifications.Replaced"));
+      if (status === "unauthorized") ui.notifications.error(localize("Notifications.Unauthorized"), { permanent: true });
     },
   });
   bridge.connect();
@@ -62,13 +78,23 @@ Hooks.once("init", () => {
     onChange: startBridge,
   });
 
-  game.settings.register(MODULE_ID, "url", {
-    name: "FOUNDRY_DECK.Settings.Url.Name",
-    hint: "FOUNDRY_DECK.Settings.Url.Hint",
+  game.settings.register(MODULE_ID, "port", {
+    name: "FOUNDRY_DECK.Settings.Port.Name",
+    hint: "FOUNDRY_DECK.Settings.Port.Hint",
+    scope: "client",
+    config: true,
+    type: Number,
+    default: DEFAULT_PORT,
+    onChange: startBridge,
+  });
+
+  game.settings.register(MODULE_ID, "token", {
+    name: "FOUNDRY_DECK.Settings.Token.Name",
+    hint: "FOUNDRY_DECK.Settings.Token.Hint",
     scope: "client",
     config: true,
     type: String,
-    default: DEFAULT_URL,
+    default: "",
     onChange: startBridge,
   });
 });

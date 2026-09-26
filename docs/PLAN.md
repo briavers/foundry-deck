@@ -119,13 +119,17 @@ key from that snapshot.
 3. **Music** *(done)*
    - Playlist toggle with a live playlist dropdown, next/previous track,
      stop all, and volume.
-4. **Polish** *(next)*
+4. **Connection settings + security** *(done)*
+   - Plugin-wide port and token, in a "Foundry connection" section on every
+     key's settings page (Stream Deck global settings). Changing the port
+     restarts the server live.
+   - Shared-token handshake: a random token is generated on first run and
+     must be pasted into the Foundry module settings. Details in
+     [PROTOCOL.md](./PROTOCOL.md#authentication).
+5. **Polish** *(next)*
    - Custom key art. Right now keys use simple generated SVG icons.
-   - Configurable port from a plugin-wide settings page. Today the port is set
-     in the module settings and the plugin environment.
-   - Optional shared-secret handshake.
    - Stream Deck+ dial support (volume, turns).
-5. **Release** *(next)*
+6. **Release** *(next)*
    - `streamdeck pack` to produce a `.streamDeckPlugin`.
    - A zipped module plus `module.json` manifest URL on GitHub releases.
    - A GitHub Actions workflow.
@@ -140,8 +144,10 @@ ln -s "$PWD/foundry-module" "<FoundryData>/Data/modules/foundry-deck"
 npm test -w foundry-module
 ```
 
-Enable **Foundry Deck** in your world. It connects automatically when a GM
-logs in.
+Enable **Foundry Deck** in your world. Open any Foundry Deck key's settings
+in the Stream Deck app, then copy the **Token** (and the **Port**, if you
+changed it) into *Game Settings → Configure Settings → Foundry Deck*. After
+that it connects automatically when a GM logs in.
 
 Stream Deck plugin. It needs Node 24 and Stream Deck 7.1+:
 
@@ -161,7 +167,12 @@ npm run watch -w streamdeck-plugin   # rebuild + restart plugin on change
 - **Foundry v14.** The module targets v13 (minimum v12). Every API used is
   stable across versions, and the v12/v13 `togglePause` signature difference
   is handled. Re-verify on v14.
-- **Security.** The server only listens on loopback. Any local process could
-  connect and pretend to be Foundry, but the plugin never runs code sent to it:
-  it only renders state and sends a fixed set of commands. A shared token is
-  listed under Polish.
+- **Security.** Several layers:
+  - The server only listens on loopback, so other machines can't reach it.
+  - Any web page open in the GM's browser could try to connect to
+    localhost. Without the token, it's closed before it can see or send
+    anything.
+  - Even an authenticated client can only push state for the keys to show.
+    The plugin never runs code it receives.
+  - The token is stored in Stream Deck's plugin settings and Foundry's
+    client-side settings, both on the GM's machine.

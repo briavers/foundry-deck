@@ -1,21 +1,44 @@
 # Foundry Deck wire protocol (v1)
 
-Transport: WebSocket, UTF-8 JSON text frames. The Stream Deck plugin listens on
-`ws://127.0.0.1:17380`. The port can be changed with the
-`FOUNDRY_DECK_PORT` environment variable on the plugin side and the **Stream
-Deck URL** module setting on the Foundry side. The Foundry module connects as a
-client from the GM's browser.
+Transport: WebSocket, UTF-8 JSON text frames, up to 1 MiB each. The Stream Deck
+plugin listens on `ws://127.0.0.1:<port>` (default `17380`). The Foundry module
+connects as a client from the GM's browser.
+
+The port and the token are plugin-wide settings. You'll find them in the
+**Foundry connection** section of any Foundry Deck key's settings in the Stream
+Deck app. The Foundry module has matching **Stream Deck port** and **Stream
+Deck token** settings.
 
 Every message is an object with a `type` field.
+
+## Authentication
+
+1. On first run the plugin generates a random 24-character token and stores it
+   in its global settings. Clearing the token field generates a new one.
+2. The **first** message on a new connection must be a `hello` carrying that
+   token. The plugin compares it in constant time.
+3. A connection is closed with code **4001** (`unauthorized`) when:
+   - its first message isn't a `hello` with the correct token, or
+   - it sends nothing within 5 seconds.
+   Until it's authenticated, a connection gets nothing from the plugin and
+   doesn't affect the active client.
+4. Once authenticated, the connection becomes the active client. Any previous
+   client is closed with code **4000** (`replaced`).
+5. When the token changes in the plugin, the active client is closed with
+   **4001**.
+
+The Foundry module doesn't reconnect after a 4000 or 4001 close. For 4001 it
+shows an error until the token setting is fixed. After any other close it
+reconnects with backoff from 1 s up to 30 s.
 
 ## Foundry → plugin
 
 ### `hello`
 
-Sent right after the connection opens.
+Sent right after the connection opens. It must be the first message.
 
 ```json
-{ "type": "hello", "protocol": 1, "module": "0.1.0", "foundry": "13.346", "world": "The Marked Five", "user": "Gamemaster" }
+{ "type": "hello", "protocol": 1, "token": "Zk3v…", "module": "0.1.0", "foundry": "13.346", "world": "The Marked Five", "user": "Gamemaster" }
 ```
 
 ### `state`

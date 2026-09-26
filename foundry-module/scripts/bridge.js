@@ -1,6 +1,9 @@
 /** Close code the plugin uses when a newer Foundry client takes over the connection. */
 export const CLOSE_REPLACED = 4000;
 
+/** Close code the plugin uses when our token is missing or wrong. */
+export const CLOSE_UNAUTHORIZED = 4001;
+
 export const PROTOCOL_VERSION = 1;
 
 const MIN_RECONNECT_MS = 1_000;
@@ -13,6 +16,7 @@ const MAX_RECONNECT_MS = 30_000;
  */
 export class DeckBridge {
   #url;
+  #token;
   #commands;
   #getState;
   #hello;
@@ -30,16 +34,18 @@ export class DeckBridge {
   /**
    * @param {object} options
    * @param {string} options.url                   ws:// address of the plugin
+   * @param {string} options.token                 shared secret shown in the plugin's settings
    * @param {Record<string, Function>} options.commands  see commands.js
    * @param {() => object} options.getState       see state.js
    * @param {() => object} options.hello          extra fields for the hello message
    * @param {typeof WebSocket} [options.WebSocket]
-   * @param {(status: "connected"|"disconnected"|"replaced") => void} [options.onStatus]
+   * @param {(status: "connected"|"disconnected"|"replaced"|"unauthorized") => void} [options.onStatus]
    * @param {Pick<Console, "debug"|"warn"|"error">} [options.logger]
    * @param {number} [options.debounceMs]
    */
-  constructor({ url, commands, getState, hello, WebSocket = globalThis.WebSocket, onStatus = () => {}, logger = console, debounceMs = 100 }) {
+  constructor({ url, token, commands, getState, hello, WebSocket = globalThis.WebSocket, onStatus = () => {}, logger = console, debounceMs = 100 }) {
     this.#url = url;
+    this.#token = token;
     this.#commands = commands;
     this.#getState = getState;
     this.#hello = hello;
@@ -85,7 +91,7 @@ export class DeckBridge {
 
     socket.addEventListener("open", () => {
       this.#reconnectDelay = MIN_RECONNECT_MS;
-      this.#send({ type: "hello", protocol: PROTOCOL_VERSION, ...this.#hello() });
+      this.#send({ type: "hello", protocol: PROTOCOL_VERSION, token: this.#token, ...this.#hello() });
       this.#sendState();
       this.#onStatus("connected");
     });
@@ -101,6 +107,13 @@ export class DeckBridge {
         // Another tab owns the deck now; reconnecting would just steal it back.
         this.#stopped = true;
         this.#onStatus("replaced");
+        return;
+      }
+
+      if (event.code === CLOSE_UNAUTHORIZED) {
+        // Retrying with the same token can't succeed; wait for the settings to change.
+        this.#stopped = true;
+        this.#onStatus("unauthorized");
         return;
       }
 

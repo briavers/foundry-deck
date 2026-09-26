@@ -2,17 +2,12 @@
 <html>
 
 <head lang="en">
-    <title>Playlist Settings</title>
+    <title>Foundry Deck Connection</title>
     <meta charset="utf-8" />
     <script src="https://sdpi-components.dev/releases/v4/sdpi-components.js"></script>
 </head>
 
 <body>
-    <!-- Items come from Foundry through the plugin; see src/actions/music.ts. -->
-    <sdpi-item label="Playlist">
-        <sdpi-select setting="playlistId" datasource="getPlaylists" hot-reload loading="Loading playlists…" placeholder="Select a playlist"></sdpi-select>
-    </sdpi-item>
-
     <!--
         Plugin-wide connection settings (stored as global settings, shared by every key).
         Keep this block identical in every ui/*.html file.

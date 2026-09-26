@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { CLOSE_REPLACED, DeckBridge } from "../scripts/bridge.js";
+import { CLOSE_REPLACED, CLOSE_UNAUTHORIZED, DeckBridge } from "../scripts/bridge.js";
 
 /** In-memory WebSocket double; each instance is recorded in `FakeSocket.instances`. */
 class FakeSocket extends EventTarget {
@@ -45,6 +45,7 @@ function makeBridge(overrides = {}) {
   const statuses = [];
   const bridge = new DeckBridge({
     url: "ws://127.0.0.1:17380",
+    token: "s3cret",
     commands: {},
     getState: () => ({ paused: false }),
     hello: () => ({ world: "Test" }),
@@ -57,14 +58,14 @@ function makeBridge(overrides = {}) {
   return { bridge, statuses };
 }
 
-test("sends hello and state on open", () => {
+test("sends hello with the token, then state, on open", () => {
   const { bridge, statuses } = makeBridge();
   bridge.connect();
   const socket = FakeSocket.instances[0];
   socket.open();
 
   assert.deepEqual(socket.sent, [
-    { type: "hello", protocol: 1, world: "Test" },
+    { type: "hello", protocol: 1, token: "s3cret", world: "Test" },
     { type: "state", state: { paused: false } },
   ]);
   assert.deepEqual(statuses, ["connected"]);
@@ -137,6 +138,17 @@ test("stays disconnected when another client replaced it", async () => {
   FakeSocket.instances[0].close(CLOSE_REPLACED);
 
   assert.deepEqual(statuses, ["connected", "replaced"]);
+  await tick(1_100);
+  assert.equal(FakeSocket.instances.length, 1);
+});
+
+test("stops retrying when the plugin rejects the token", async () => {
+  const { bridge, statuses } = makeBridge();
+  bridge.connect();
+  FakeSocket.instances[0].open();
+  FakeSocket.instances[0].close(CLOSE_UNAUTHORIZED);
+
+  assert.deepEqual(statuses, ["connected", "unauthorized"]);
   await tick(1_100);
   assert.equal(FakeSocket.instances.length, 1);
 });

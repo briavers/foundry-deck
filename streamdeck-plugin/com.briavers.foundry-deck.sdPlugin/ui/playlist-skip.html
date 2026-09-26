@@ -12,6 +12,21 @@
     <sdpi-item label="Playlist">
         <sdpi-select setting="playlistId" datasource="getPlaylistsOrAny" hot-reload loading="Loading playlists…" default=""></sdpi-select>
     </sdpi-item>
+
+    <!--
+        Plugin-wide connection settings (stored as global settings, shared by every key).
+        Keep this block identical in every ui/*.html file.
+    -->
+    <sdpi-heading>Foundry connection</sdpi-heading>
+    <sdpi-item label="Port">
+        <sdpi-textfield setting="port" global pattern="[0-9]{4,5}" required placeholder="17380"></sdpi-textfield>
+    </sdpi-item>
+    <sdpi-item label="Token">
+        <sdpi-textfield setting="token" global placeholder="Clear to generate a new token"></sdpi-textfield>
+    </sdpi-item>
+    <sdpi-item>
+        <span>Copy the port and token into Foundry: Game Settings → Configure Settings → Foundry Deck.</span>
+    </sdpi-item>
 </body>
 
 </html>

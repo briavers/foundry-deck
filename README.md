@@ -36,9 +36,17 @@ npm run watch          # rebuilds and restarts the plugin when you change code
 ```
 
 **Foundry.** Symlink or copy `foundry-module/` to
-`<FoundryData>/Data/modules/foundry-deck`. Enable **Foundry Deck** in your
-world and log in as a GM. You'll see *"Foundry Deck: connected to Stream
-Deck."* when it connects.
+`<FoundryData>/Data/modules/foundry-deck` and enable **Foundry Deck** in your
+world.
 
-The plugin listens on `ws://127.0.0.1:17380`. The Stream Deck must be plugged
-into the same computer as the GM's browser.
+**Pair them.**
+
+1. In the Stream Deck app, drag any Foundry Deck action onto a key and open
+   its settings.
+2. The **Foundry connection** section shows the **Port** (default `17380`) and
+   a generated **Token**.
+3. In Foundry, go to *Game Settings → Configure Settings → Foundry Deck*,
+   paste the token, and set the same port.
+
+You'll see *"Foundry Deck: connected to Stream Deck."* when it connects. The
+Stream Deck must be plugged into the same computer as the GM's browser.

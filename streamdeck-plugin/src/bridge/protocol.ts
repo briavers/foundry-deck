@@ -8,6 +8,9 @@ export const DEFAULT_PORT = 17380;
 /** Close code sent to a Foundry client when a newer client takes over. */
 export const CLOSE_REPLACED = 4000;
 
+/** Close code sent when a client's token is missing or wrong, or the token was changed. */
+export const CLOSE_UNAUTHORIZED = 4001;
+
 export type CombatantState = {
 	id: string;
 	name: string;
@@ -59,6 +62,8 @@ export type CommandName = keyof CommandParams;
 export type HelloMessage = {
 	type: "hello";
 	protocol: number;
+	/** Shared secret from the plugin's connection settings. */
+	token?: string;
 	module?: string;
 	foundry?: string;
 	world?: string;

@@ -15,6 +15,8 @@ import { fakeCombat, fakeGame, fakePlaylist } from "../../foundry-module/test/fa
 import { FoundryBridge } from "../src/bridge/foundry-bridge";
 import type { FoundryState } from "../src/bridge/protocol";
 
+const TOKEN = "e2e-token";
+
 const waitFor = async (check: () => boolean, timeoutMs = 1_000) => {
 	const start = Date.now();
 	while (!check()) {
@@ -29,7 +31,7 @@ describe("Foundry module ↔ Stream Deck plugin", () => {
 	let game: ReturnType<typeof fakeGame>;
 
 	beforeEach(async () => {
-		server = new FoundryBridge({ port: 0 });
+		server = new FoundryBridge({ port: 0, token: TOKEN });
 		await server.start();
 
 		game = fakeGame({
@@ -39,6 +41,7 @@ describe("Foundry module ↔ Stream Deck plugin", () => {
 
 		client = new DeckBridge({
 			url: `ws://127.0.0.1:${server.port}`,
+			token: TOKEN,
 			commands: createCommands(game),
 			getState: () => collectState(game),
 			hello: () => ({ world: "E2E", user: "GM" }),
@@ -72,6 +75,25 @@ describe("Foundry module ↔ Stream Deck plugin", () => {
 		const state = server.state as FoundryState;
 		expect(state.paused).toBe(true);
 		expect(state.playlists[0].playing).toBe(true);
+	});
+
+	it("keeps a Foundry client with the wrong token out", async () => {
+		const statuses: string[] = [];
+		const intruder = new DeckBridge({
+			url: `ws://127.0.0.1:${server.port}`,
+			token: "wrong",
+			commands: createCommands(fakeGame()),
+			getState: () => collectState(fakeGame({ paused: true })),
+			hello: () => ({ world: "Intruder" }),
+			WebSocket: globalThis.WebSocket,
+			onStatus: (s: string) => statuses.push(s),
+		});
+		intruder.connect();
+		await waitFor(() => statuses.includes("unauthorized"));
+
+		expect(server.hello?.world).toBe("E2E");
+		expect(server.state?.paused).toBe(false);
+		intruder.disconnect();
 	});
 
 	it("surfaces Foundry-side errors to the plugin", async () => {
