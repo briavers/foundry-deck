@@ -1,0 +1,211 @@
+{
+	"$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
+	"Name": "Foundry Deck",
+	"Version": "0.1.0.0",
+	"Author": "briavers",
+	"Actions": [
+		{
+			"Name": "Next Turn",
+			"UUID": "com.briavers.foundry-deck.combat-next-turn",
+			"Tooltip": "Advance the combat tracker to the next combatant. Shows whose turn it is.",
+			"Icon": "imgs/actions/combat-next-turn/icon",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/combat-next-turn/key",
+					"TitleAlignment": "bottom"
+				}
+			]
+		},
+		{
+			"Name": "Previous Turn",
+			"UUID": "com.briavers.foundry-deck.combat-previous-turn",
+			"Tooltip": "Go back to the previous combatant.",
+			"Icon": "imgs/actions/combat-previous-turn/icon",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/combat-previous-turn/key",
+					"TitleAlignment": "middle"
+				}
+			]
+		},
+		{
+			"Name": "Next Round",
+			"UUID": "com.briavers.foundry-deck.combat-next-round",
+			"Tooltip": "Advance the combat tracker to the next round. Shows the current round.",
+			"Icon": "imgs/actions/combat-next-round/icon",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/combat-next-round/key",
+					"TitleAlignment": "bottom"
+				}
+			]
+		},
+		{
+			"Name": "Previous Round",
+			"UUID": "com.briavers.foundry-deck.combat-previous-round",
+			"Tooltip": "Go back to the previous round.",
+			"Icon": "imgs/actions/combat-previous-round/icon",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/combat-previous-round/key",
+					"TitleAlignment": "middle"
+				}
+			]
+		},
+		{
+			"Name": "Start Combat",
+			"UUID": "com.briavers.foundry-deck.combat-start",
+			"Tooltip": "Start the encounter shown in the combat tracker.",
+			"Icon": "imgs/actions/combat-start/icon",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/combat-start/key",
+					"TitleAlignment": "middle"
+				}
+			]
+		},
+		{
+			"Name": "Pause / Unpause",
+			"UUID": "com.briavers.foundry-deck.pause",
+			"Tooltip": "Toggle the game pause for everyone.",
+			"Icon": "imgs/actions/pause/icon",
+			"Controllers": [
+				"Keypad"
+			],
+			"DisableAutomaticStates": true,
+			"States": [
+				{
+					"Image": "imgs/actions/pause/key",
+					"TitleAlignment": "middle"
+				},
+				{
+					"Image": "imgs/actions/pause/key-1",
+					"TitleAlignment": "middle"
+				}
+			]
+		},
+		{
+			"Name": "Playlist Play / Stop",
+			"UUID": "com.briavers.foundry-deck.playlist-toggle",
+			"Tooltip": "Play or stop a playlist. Shows its name and whether it's playing.",
+			"Icon": "imgs/actions/playlist-toggle/icon",
+			"PropertyInspectorPath": "ui/playlist.html",
+			"Controllers": [
+				"Keypad"
+			],
+			"DisableAutomaticStates": true,
+			"States": [
+				{
+					"Image": "imgs/actions/playlist-toggle/key",
+					"TitleAlignment": "bottom"
+				},
+				{
+					"Image": "imgs/actions/playlist-toggle/key-1",
+					"TitleAlignment": "bottom"
+				}
+			]
+		},
+		{
+			"Name": "Next Track",
+			"UUID": "com.briavers.foundry-deck.playlist-next",
+			"Tooltip": "Skip to the next track of a playlist, or of whatever is playing.",
+			"Icon": "imgs/actions/playlist-next/icon",
+			"PropertyInspectorPath": "ui/playlist-skip.html",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/playlist-next/key",
+					"TitleAlignment": "middle"
+				}
+			]
+		},
+		{
+			"Name": "Previous Track",
+			"UUID": "com.briavers.foundry-deck.playlist-previous",
+			"Tooltip": "Go back to the previous track of a playlist, or of whatever is playing.",
+			"Icon": "imgs/actions/playlist-previous/icon",
+			"PropertyInspectorPath": "ui/playlist-skip.html",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/playlist-previous/key",
+					"TitleAlignment": "middle"
+				}
+			]
+		},
+		{
+			"Name": "Stop All Music",
+			"UUID": "com.briavers.foundry-deck.playlist-stop-all",
+			"Tooltip": "Stop every playing playlist.",
+			"Icon": "imgs/actions/playlist-stop-all/icon",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/playlist-stop-all/key",
+					"TitleAlignment": "middle"
+				}
+			]
+		},
+		{
+			"Name": "Music Volume",
+			"UUID": "com.briavers.foundry-deck.volume",
+			"Tooltip": "Raise or lower Foundry's global music volume.",
+			"Icon": "imgs/actions/volume/icon",
+			"PropertyInspectorPath": "ui/volume.html",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/volume/key",
+					"TitleAlignment": "bottom"
+				}
+			]
+		}
+	],
+	"Category": "Foundry Deck",
+	"CategoryIcon": "imgs/plugin/category-icon",
+	"CodePath": "bin/plugin.js",
+	"Description": "Control Foundry VTT's combat tracker, pause and music from your Stream Deck. Requires the Foundry Deck module in Foundry.",
+	"Icon": "imgs/plugin/marketplace",
+	"SDKVersion": 3,
+	"Software": {
+		"MinimumVersion": "7.1"
+	},
+	"OS": [
+		{
+			"Platform": "mac",
+			"MinimumVersion": "12"
+		},
+		{
+			"Platform": "windows",
+			"MinimumVersion": "10"
+		}
+	],
+	"Nodejs": {
+		"Version": "24",
+		"Debug": "enabled"
+	},
+	"UUID": "com.briavers.foundry-deck"
+}

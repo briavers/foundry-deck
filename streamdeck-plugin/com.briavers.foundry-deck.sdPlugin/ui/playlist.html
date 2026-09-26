@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <title>Playlist Settings</title>
+    <meta charset="utf-8" />
+    <script src="https://sdpi-components.dev/releases/v4/sdpi-components.js"></script>
+</head>
+
+<body>
+    <!-- Items come from Foundry through the plugin; see src/actions/music.ts. -->
+    <sdpi-item label="Playlist">
+        <sdpi-select setting="playlistId" datasource="getPlaylists" hot-reload loading="Loading playlists…" placeholder="Select a playlist"></sdpi-select>
+    </sdpi-item>
+</body>
+
+</html>

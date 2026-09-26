@@ -1,0 +1,13 @@
+{
+  "name": "foundry-deck",
+  "private": true,
+  "description": "Control Foundry VTT (combat tracker, pause, music) from an Elgato Stream Deck.",
+  "workspaces": [
+    "foundry-module",
+    "streamdeck-plugin"
+  ],
+  "scripts": {
+    "build": "npm run build -w streamdeck-plugin",
+    "test": "npm test --workspaces"
+  }
+}

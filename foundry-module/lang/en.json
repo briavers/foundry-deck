@@ -1,0 +1,18 @@
+{
+  "FOUNDRY_DECK": {
+    "Settings": {
+      "Enabled": {
+        "Name": "Connect to Stream Deck",
+        "Hint": "Connect this browser to the Foundry Deck Stream Deck plugin. Only GM clients connect."
+      },
+      "Url": {
+        "Name": "Stream Deck URL",
+        "Hint": "WebSocket address of the Foundry Deck Stream Deck plugin on this computer."
+      }
+    },
+    "Notifications": {
+      "Connected": "Foundry Deck: connected to Stream Deck.",
+      "Replaced": "Foundry Deck: another Foundry tab took over the Stream Deck connection."
+    }
+  }
+}

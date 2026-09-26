@@ -1,0 +1,11 @@
+{
+  "name": "foundry-deck-module",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Foundry VTT module that exposes combat, pause and playlist controls to the Foundry Deck Stream Deck plugin.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test \"test/**/*.test.js\"",
+    "package": "rm -f foundry-deck.zip && zip -r foundry-deck.zip module.json scripts lang"
+  }
+}
