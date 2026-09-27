@@ -85,6 +85,28 @@ export class PreviousTrackAction extends FoundryAction<PlaylistSettings> {
 	}
 }
 
+/** Toggles repeat on the track currently playing in a playlist; the key shows on/off. */
+@action({ UUID: "com.briavers.foundry-deck.playlist-loop" })
+export class LoopAction extends FoundryAction<PlaylistSettings> {
+	protected override command({ playlistId }: PlaylistSettings): Command | null {
+		return playlistId ? { command: "playlist.toggleRepeat", params: { playlistId } } : null;
+	}
+
+	protected override async render(action: KeyAction<PlaylistSettings>, { playlistId }: PlaylistSettings, state: FoundryState | null): Promise<void> {
+		const playlist = state?.playlists.find((p) => p.id === playlistId);
+		const current = playlist?.sounds?.find((s) => s.playing);
+		await action.setState(current?.repeat ? PLAYING : STOPPED);
+
+		if (!playlistId) await action.setTitle("Pick a\nplaylist");
+		else if (playlist) await action.setTitle(fitTitle(playlist.name));
+		else if (state) await action.setTitle("Missing\nplaylist");
+	}
+
+	override async onSendToPlugin(ev: SendToPluginEvent<JsonValue, PlaylistSettings>): Promise<void> {
+		await answerPlaylistRequest(ev, this.foundry);
+	}
+}
+
 @action({ UUID: "com.briavers.foundry-deck.playlist-stop-all" })
 export class StopAllMusicAction extends FoundryAction<NoSettings> {
 	protected override command(): Command {

@@ -1,7 +1,7 @@
 import streamDeck from "@elgato/streamdeck";
 
 import { NextRoundAction, NextTurnAction, PreviousRoundAction, PreviousTurnAction, StartCombatAction } from "./actions/combat";
-import { NextTrackAction, PlaylistToggleAction, PreviousTrackAction, StopAllMusicAction, VolumeAction } from "./actions/music";
+import { LoopAction, NextTrackAction, PlaylistToggleAction, PreviousTrackAction, StopAllMusicAction, VolumeAction } from "./actions/music";
 import { PauseAction } from "./actions/pause";
 import { FoundryBridge } from "./bridge/foundry-bridge";
 import { DEFAULT_PORT } from "./bridge/protocol";
@@ -22,6 +22,7 @@ streamDeck.actions.registerAction(new PauseAction(foundry));
 streamDeck.actions.registerAction(new PlaylistToggleAction(foundry));
 streamDeck.actions.registerAction(new NextTrackAction(foundry));
 streamDeck.actions.registerAction(new PreviousTrackAction(foundry));
+streamDeck.actions.registerAction(new LoopAction(foundry));
 streamDeck.actions.registerAction(new StopAllMusicAction(foundry));
 streamDeck.actions.registerAction(new VolumeAction(foundry));
 

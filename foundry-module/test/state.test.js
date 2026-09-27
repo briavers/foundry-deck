@@ -38,19 +38,28 @@ test("collectState hides the combatant before combat starts", () => {
   assert.equal(collectState(fakeGame({ combat })).combat.combatant, null);
 });
 
-test("collectState lists playlists with their playing tracks", () => {
+test("collectState lists playlists with their tracks", () => {
   const playlist = fakePlaylist({
     id: "tavern",
     name: "Tavern",
     playing: true,
     mode: 1,
     sounds: [
-      { name: "Drunken Sailor", playing: true },
-      { name: "Silent Night", playing: false },
+      { id: "s1", name: "Drunken Sailor", playing: true, repeat: true },
+      { id: "s2", name: "Silent Night", playing: false },
     ],
   });
 
   assert.deepEqual(collectState(fakeGame({ playlists: [playlist] })).playlists, [
-    { id: "tavern", name: "Tavern", playing: true, mode: 1, tracks: ["Drunken Sailor"] },
+    {
+      id: "tavern",
+      name: "Tavern",
+      playing: true,
+      mode: 1,
+      sounds: [
+        { id: "s1", name: "Drunken Sailor", playing: true, repeat: true },
+        { id: "s2", name: "Silent Night", playing: false, repeat: false },
+      ],
+    },
   ]);
 });

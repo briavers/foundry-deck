@@ -101,9 +101,12 @@ with a real Foundry world or a physical Stream Deck.**
 ## Next steps (roadmap)
 
 1. **Smoke test** (above), then fix whatever it finds.
-2. **Icons / key art.** Replace the generated placeholders in
-   `scripts/generate-icons.mjs` (you've said you'll handle these later).
-   Optional ideas:
+2. **Icons / key art.** Done: key images are now fantasy-style PNGs
+   (`imgs/actions/<name>/key(-1)(@2x).png`, source renders in `assets/icons/`
+   at the repo root), generated via the `dam` MCP server. The action-list
+   glyphs in `scripts/generate-icons.mjs` are unchanged (still generated
+   placeholders) since they need a flat white-on-transparent style, not full
+   art. Optional ideas:
    - render the combatant's token image on the Next Turn key via
      `setImage` (`state.combat.combatant.img` is already sent);
    - show a "disconnected" look while `state === null`.

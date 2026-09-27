@@ -37,6 +37,11 @@ function collectPlaylist(playlist) {
     name: playlist.name,
     playing: Boolean(playlist.playing),
     mode: playlist.mode,
-    tracks: playlist.sounds.contents.filter((s) => s.playing).map((s) => s.name),
+    sounds: playlist.sounds.contents.map((s) => ({
+      id: s.id,
+      name: s.name,
+      playing: Boolean(s.playing),
+      repeat: Boolean(s.repeat),
+    })),
   };
 }

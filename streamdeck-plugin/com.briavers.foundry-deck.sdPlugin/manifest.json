@@ -154,6 +154,27 @@
 			]
 		},
 		{
+			"Name": "Loop Track",
+			"UUID": "com.briavers.foundry-deck.playlist-loop",
+			"Tooltip": "Toggle repeat on the track currently playing in a playlist.",
+			"Icon": "imgs/actions/playlist-loop/icon",
+			"PropertyInspectorPath": "ui/playlist.html",
+			"Controllers": [
+				"Keypad"
+			],
+			"DisableAutomaticStates": true,
+			"States": [
+				{
+					"Image": "imgs/actions/playlist-loop/key",
+					"TitleAlignment": "bottom"
+				},
+				{
+					"Image": "imgs/actions/playlist-loop/key-1",
+					"TitleAlignment": "bottom"
+				}
+			]
+		},
+		{
 			"Name": "Stop All Music",
 			"UUID": "com.briavers.foundry-deck.playlist-stop-all",
 			"Tooltip": "Stop every playing playlist.",

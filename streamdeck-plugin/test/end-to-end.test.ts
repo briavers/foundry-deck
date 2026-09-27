@@ -36,7 +36,7 @@ describe("Foundry module ↔ Stream Deck plugin", () => {
 
 		game = fakeGame({
 			combat: fakeCombat({ round: 2, turn: 0, combatants: [{ id: "a", name: "Aria" }] }),
-			playlists: [fakePlaylist({ id: "tavern", name: "Tavern" })],
+			playlists: [fakePlaylist({ id: "tavern", name: "Tavern", sounds: [{ id: "s1", name: "Drunken Sailor" }] })],
 		});
 
 		client = new DeckBridge({
@@ -60,7 +60,15 @@ describe("Foundry module ↔ Stream Deck plugin", () => {
 	it("receives hello and the initial state", () => {
 		expect(server.hello).toMatchObject({ protocol: 1, world: "E2E", user: "GM" });
 		expect(server.state?.combat).toMatchObject({ round: 2, combatant: { name: "Aria" } });
-		expect(server.state?.playlists).toEqual([{ id: "tavern", name: "Tavern", playing: false, mode: 0, tracks: [] }]);
+		expect(server.state?.playlists).toEqual([
+			{
+				id: "tavern",
+				name: "Tavern",
+				playing: false,
+				mode: 0,
+				sounds: [{ id: "s1", name: "Drunken Sailor", playing: false, repeat: false }],
+			},
+		]);
 	});
 
 	it("runs commands in Foundry and sees the resulting state", async () => {

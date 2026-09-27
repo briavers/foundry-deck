@@ -26,12 +26,19 @@ export type CombatState = {
 	count: number;
 };
 
+export type SoundState = {
+	id: string;
+	name: string;
+	playing: boolean;
+	repeat: boolean;
+};
+
 export type PlaylistState = {
 	id: string;
 	name: string;
 	playing: boolean;
 	mode: number;
-	tracks: string[];
+	sounds: SoundState[];
 };
 
 export type FoundryState = {
@@ -49,11 +56,12 @@ export type CommandParams = {
 	"combat.start": Record<string, never>;
 	"game.togglePause": { paused?: boolean };
 	"playlist.toggle": { playlistId: string };
-	"playlist.play": { playlistId: string };
+	"playlist.play": { playlistId: string; soundId?: string; random?: boolean };
 	"playlist.stop": { playlistId: string };
 	"playlist.next": { playlistId?: string };
 	"playlist.previous": { playlistId?: string };
 	"playlist.stopAll": Record<string, never>;
+	"playlist.toggleRepeat": { playlistId: string };
 	"volume.adjust": { delta: number };
 };
 

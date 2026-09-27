@@ -1,9 +1,11 @@
 /**
- * Generates the SVG action-list icons and key images in the .sdPlugin folder.
+ * Generates the SVG action-list icons in the .sdPlugin folder.
  * Run with `npm run icons` after editing the glyphs below.
  *
  * - Action list icons: white glyph on transparent (Stream Deck guideline).
- * - Key images: glyph on a coloured tile; the glyph sits high so titles fit underneath.
+ * - Key images (the art on the physical keys) are no longer generated here: they're
+ *   hand-picked fantasy-style PNGs in `imgs/actions/<name>/key(-1)(@2x).png`. See
+ *   assets/icons/ at the repo root for the source renders.
  */
 import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
@@ -24,6 +26,7 @@ const glyphs = {
 	stop: { fill: "M6 6h12v12H6z" },
 	volume: { fill: "M3 9h4l5-4.5v15L7 15H3z", stroke: "M15.5 8.5a5 5 0 0 1 0 7 M18.5 5.5a9 9 0 0 1 0 13" },
 	d20: { stroke: "M12 2l8.66 5v10L12 22l-8.66-5V7z M12 2L7 15h10z M3.34 7L7 15 M20.66 7L17 15 M7 15l5 7 5-7" },
+	loop: { stroke: "M6 7h9a5 5 0 0 1 5 5v1 M18 17H9a5 5 0 0 1-5-5v-1", fill: "M6 3l4 4-4 4z M18 21l-4-4 4-4z" },
 };
 
 const colors = {
@@ -65,26 +68,24 @@ function write(relative, content) {
 	writeFileSync(file, content);
 }
 
-/** [folder, list glyph, key states: [glyph, background, titled]] */
+/** [folder, list glyph] */
 const actions = [
-	["combat-next-turn", "nextTurn", [["nextTurn", colors.combat, true]]],
-	["combat-previous-turn", "previousTurn", [["previousTurn", colors.combat]]],
-	["combat-next-round", "nextRound", [["nextRound", colors.combat, true]]],
-	["combat-previous-round", "previousRound", [["previousRound", colors.combat]]],
-	["combat-start", "startCombat", [["startCombat", colors.combat]]],
-	["pause", "pause", [["play", colors.game], ["pause", colors.paused]]],
-	["playlist-toggle", "music", [["music", colors.music, true], ["music", colors.active, true]]],
-	["playlist-next", "nextTurn", [["nextTurn", colors.music]]],
-	["playlist-previous", "previousTurn", [["previousTurn", colors.music]]],
-	["playlist-stop-all", "stop", [["stop", colors.music]]],
-	["volume", "volume", [["volume", colors.music, true]]],
+	["combat-next-turn", "nextTurn"],
+	["combat-previous-turn", "previousTurn"],
+	["combat-next-round", "nextRound"],
+	["combat-previous-round", "previousRound"],
+	["combat-start", "startCombat"],
+	["pause", "pause"],
+	["playlist-toggle", "music"],
+	["playlist-next", "nextTurn"],
+	["playlist-previous", "previousTurn"],
+	["playlist-loop", "loop"],
+	["playlist-stop-all", "stop"],
+	["volume", "volume"],
 ];
 
-for (const [folder, list, states] of actions) {
+for (const [folder, list] of actions) {
 	write(`actions/${folder}/icon.svg`, listIcon(glyphs[list]));
-	states.forEach(([glyph, background, titled], i) => {
-		write(`actions/${folder}/key${i === 0 ? "" : `-${i}`}.svg`, keyImage(glyphs[glyph], background, { titled }));
-	});
 }
 
 write("plugin/category-icon.svg", listIcon(glyphs.d20).replace('width="20" height="20"', 'width="28" height="28"'));

@@ -10,18 +10,41 @@ class FakeCollection {
   }
 }
 
-export function fakePlaylist({ id, name = id, playing = false, mode = 0, sounds = [] }) {
+export function fakePlaylist({ id, name = id, playing = false, mode = 0, sounds = [], playbackOrder } = {}) {
   const calls = [];
+  const soundList = sounds.map((s) => ({ id: s.name, repeat: false, pausedTime: null, playing: false, ...s }));
   return {
     id,
     name,
     playing,
     mode,
-    sounds: new FakeCollection(sounds),
+    sounds: new FakeCollection(soundList),
+    get playbackOrder() { return playbackOrder ?? soundList.map((s) => s.id); },
     calls,
     async playAll() { calls.push(["playAll"]); this.playing = true; },
-    async stopAll() { calls.push(["stopAll"]); this.playing = false; },
+    async stopAll() {
+      calls.push(["stopAll"]);
+      this.playing = false;
+      for (const s of soundList) s.playing = false;
+    },
     async playNext(soundId, options) { calls.push(["playNext", soundId, options]); },
+    async update(data) {
+      calls.push(["update", data]);
+      if ("playing" in data) this.playing = data.playing;
+      if (Array.isArray(data.sounds)) {
+        for (const patch of data.sounds) {
+          const s = soundList.find((x) => x.id === patch._id);
+          if (s) Object.assign(s, patch);
+        }
+      }
+    },
+    async updateEmbeddedDocuments(_type, updates) {
+      calls.push(["updateEmbeddedDocuments", _type, updates]);
+      for (const patch of updates) {
+        const s = soundList.find((x) => x.id === patch._id);
+        if (s) Object.assign(s, patch);
+      }
+    },
   };
 }
 

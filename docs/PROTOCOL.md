@@ -61,7 +61,16 @@ A full snapshot. It's sent after `hello`, after any relevant Foundry hook
       "count": 6
     },
     "playlists": [
-      { "id": "p1", "name": "Tavern", "playing": true, "mode": 0, "tracks": ["Drunken Sailor"] }
+      {
+        "id": "p1",
+        "name": "Tavern",
+        "playing": true,
+        "mode": 0,
+        "sounds": [
+          { "id": "s1", "name": "Drunken Sailor", "playing": true, "repeat": false },
+          { "id": "s2", "name": "Silent Night", "playing": false, "repeat": false }
+        ]
+      }
     ]
   }
 }
@@ -72,7 +81,7 @@ A full snapshot. It's sent after `hello`, after any relevant Foundry hook
   empty.
 - `mode` uses `CONST.PLAYLIST_MODES`: `-1` disabled, `0` sequential,
   `1` shuffle, `2` simultaneous.
-- `tracks` lists the names of the sounds that are currently playing.
+- `sounds` lists every track in the playlist, in no particular order.
 
 ### `result`
 
@@ -99,12 +108,13 @@ The reply to a `command`, matched by `id`.
 | `combat.previousRound`  | –                                   |                                                        |
 | `combat.start`          | –                                   | Starts the encounter being viewed                      |
 | `game.togglePause`      | `{ paused?: boolean }`              | Without `paused` it flips the current state            |
-| `playlist.toggle`       | `{ playlistId }`                    | Plays all if stopped, stops all if playing             |
-| `playlist.play`         | `{ playlistId }`                    |                                                        |
+| `playlist.toggle`       | `{ playlistId }`                    | Plays one track if stopped, stops all if playing        |
+| `playlist.play`         | `{ playlistId, soundId?, random? }` | Starts exactly one track, in every playback mode. Without `soundId`/`random`, resumes a paused track or starts the first one in the playlist's order |
 | `playlist.stop`         | `{ playlistId }`                    |                                                        |
-| `playlist.next`         | `{ playlistId? }`                   | Without an id: every playlist that's playing           |
-| `playlist.previous`     | `{ playlistId? }`                   | Without an id: every playlist that's playing           |
+| `playlist.next`         | `{ playlistId? }`                   | Without an id: every playlist that's playing. Follows the playlist's own order regardless of mode |
+| `playlist.previous`     | `{ playlistId? }`                   | Without an id: every playlist that's playing. Follows the playlist's own order regardless of mode |
 | `playlist.stopAll`      | –                                   | Stops every playlist that's playing                    |
+| `playlist.toggleRepeat` | `{ playlistId }`                    | Toggles repeat on the track currently playing in the playlist |
 | `volume.adjust`         | `{ delta: number }`                 | Adds to `core.globalPlaylistVolume`, clamped to 0..1   |
 
 ### `requestState`

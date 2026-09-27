@@ -54,31 +54,103 @@ test("game.togglePause uses the legacy push flag on v12", async () => {
 });
 
 test("playlist.toggle plays a stopped playlist and stops a playing one", async () => {
-  const tavern = fakePlaylist({ id: "tavern" });
+  const tavern = fakePlaylist({ id: "tavern", sounds: [{ id: "s1" }, { id: "s2" }] });
   const commands = createCommands(fakeGame({ playlists: [tavern] }));
 
   await commands["playlist.toggle"]({ playlistId: "tavern" });
-  await commands["playlist.toggle"]({ playlistId: "tavern" });
+  assert.deepEqual(tavern.calls, [
+    [
+      "update",
+      {
+        playing: true,
+        sounds: [
+          { _id: "s1", playing: true, pausedTime: null },
+          { _id: "s2", playing: false, pausedTime: null },
+        ],
+      },
+    ],
+  ]);
 
-  assert.deepEqual(tavern.calls, [["playAll"], ["stopAll"]]);
+  await commands["playlist.toggle"]({ playlistId: "tavern" });
+  assert.deepEqual(tavern.calls[1], ["stopAll"]);
+
   await assert.rejects(commands["playlist.toggle"]({ playlistId: "nope" }), /not found/);
 });
 
-test("playlist.next/previous target the given playlist or everything playing", async () => {
-  const tavern = fakePlaylist({ id: "tavern", playing: true });
-  const boss = fakePlaylist({ id: "boss", playing: false });
+test("playlist.play always starts exactly one track, even in Simultaneous mode", async () => {
+  const tavern = fakePlaylist({ id: "tavern", mode: 2, sounds: [{ id: "s1" }, { id: "s2" }] });
+  const commands = createCommands(fakeGame({ playlists: [tavern] }));
+
+  await commands["playlist.play"]({ playlistId: "tavern", soundId: "s2" });
+
+  assert.deepEqual(tavern.calls, [
+    [
+      "update",
+      {
+        playing: true,
+        sounds: [
+          { _id: "s1", playing: false, pausedTime: null },
+          { _id: "s2", playing: true, pausedTime: null },
+        ],
+      },
+    ],
+  ]);
+});
+
+test("playlist.play picks a random track when asked", async () => {
+  const tavern = fakePlaylist({ id: "tavern", sounds: [{ id: "s1" }] });
+  const commands = createCommands(fakeGame({ playlists: [tavern] }));
+
+  await commands["playlist.play"]({ playlistId: "tavern", random: true });
+
+  assert.equal(tavern.calls[0][1].sounds.find((s) => s._id === "s1").playing, true);
+});
+
+test("playlist.play rejects an unknown track", async () => {
+  const tavern = fakePlaylist({ id: "tavern", sounds: [{ id: "s1" }] });
+  const commands = createCommands(fakeGame({ playlists: [tavern] }));
+  await assert.rejects(commands["playlist.play"]({ playlistId: "tavern", soundId: "nope" }), /Track not found/);
+});
+
+test("playlist.next/previous target the given playlist or everything playing, following playback order", async () => {
+  const tavern = fakePlaylist({ id: "tavern", playing: true, sounds: [{ id: "s1", playing: true }, { id: "s2" }] });
+  const boss = fakePlaylist({ id: "boss", playing: false, sounds: [{ id: "b1" }, { id: "b2", playing: true }] });
   const commands = createCommands(fakeGame({ playlists: [tavern, boss] }));
 
   await commands["playlist.next"]();
   await commands["playlist.previous"]({ playlistId: "boss" });
 
-  assert.deepEqual(tavern.calls, [["playNext", null, { direction: 1 }]]);
-  assert.deepEqual(boss.calls, [["playNext", null, { direction: -1 }]]);
+  assert.equal(tavern.sounds.get("s2").playing, true);
+  assert.equal(tavern.sounds.get("s1").playing, false);
+  assert.equal(boss.sounds.get("b1").playing, true);
+  assert.equal(boss.sounds.get("b2").playing, false);
 });
 
 test("playlist.next without a target fails when nothing plays", async () => {
   const commands = createCommands(fakeGame({ playlists: [fakePlaylist({ id: "a" })] }));
   await assert.rejects(commands["playlist.next"](), /No playlist is playing/);
+});
+
+test("playlist.toggleRepeat flips repeat on the currently playing track", async () => {
+  const tavern = fakePlaylist({ id: "tavern", sounds: [{ id: "s1", playing: true }, { id: "s2" }] });
+  const commands = createCommands(fakeGame({ playlists: [tavern] }));
+
+  await commands["playlist.toggleRepeat"]({ playlistId: "tavern" });
+  assert.equal(tavern.sounds.get("s1").repeat, true);
+
+  await commands["playlist.toggleRepeat"]({ playlistId: "tavern" });
+  assert.equal(tavern.sounds.get("s1").repeat, false);
+
+  await assert.rejects(
+    commands["playlist.toggleRepeat"]({ playlistId: "tavern-none" }),
+    /not found/,
+  );
+});
+
+test("playlist.toggleRepeat fails when nothing is playing", async () => {
+  const tavern = fakePlaylist({ id: "tavern", sounds: [{ id: "s1" }] });
+  const commands = createCommands(fakeGame({ playlists: [tavern] }));
+  await assert.rejects(commands["playlist.toggleRepeat"]({ playlistId: "tavern" }), /No track is playing/);
 });
 
 test("playlist.stopAll stops only playing playlists", async () => {
